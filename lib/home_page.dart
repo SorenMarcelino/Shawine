@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'camera_page.dart';
+import 'login_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -69,11 +70,13 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'Cliquez sur le bouton "Appareil photo" pour analyser un vin',
+              'Connectez vous pour noter les vin et poster des commentaires',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            TextButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(title: "Login")));
+              },
+              child: const Text('Se connecter/S\'inscrire ',),
             ),
           ],
         ),
@@ -85,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         //tooltip: 'Increment',
         child: const Icon(Icons.camera_alt_rounded),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
