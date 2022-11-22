@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'camera_page.dart';
 import 'login_page.dart';
+import 'Vins.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -22,18 +25,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Future<List<Vins>> vinsFuture = getVins();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  static Future<List<Vins>> getVins() async {
+    var response =
+        await http.get(Uri.parse('http://192.168.1.154:5000/api/vins'));
+    var body = json.decode(response.body);
+    print("dataContentVins : $body");
+    return body.map<Vins>(Vins.fromJson).toList();
   }
+
+  Widget buildVins(List<Vins> vins) => ListView.builder(
+        shrinkWrap: true,
+        itemCount: vins.length,
+        itemBuilder: (context, index) {
+          final vin = vins[index];
+          return Card(
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 28,
+                backgroundImage: NetworkImage(vin.image_bouteille),
+              ),
+              title: Text(vin.nom),
+              subtitle: Text(vin.couleur),
+            ),
+          );
+        },
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -44,41 +62,62 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Connectez vous pour noter les vin et poster des commentaires',
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(title: "Login")));
-              },
-              child: const Text('Se connecter/S\'inscrire ',),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            // Column is also a layout widget. It takes a list of children and
+            // arranges them vertically. By default, it sizes itself to fit its
+            // children horizontally, and tries to be as tall as its parent.
+            //
+            // Invoke "debug painting" (press "p" in the console, choose the
+            // "Toggle Debug Paint" action from the Flutter Inspector in Android
+            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+            // to see the wireframe for each widget.
+            //
+            // Column has various properties to control how it sizes itself and
+            // how it positions its children. Here we use mainAxisAlignment to
+            // center the children vertically; the main axis here is the vertical
+            // axis because Columns are vertical (the cross axis would be
+            // horizontal).
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'Connectez vous pour noter les vin et poster des commentaires',
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LoginPage(title: "Login")));
+                },
+                child: const Text(
+                  'Se connecter/S\'inscrire ',
+                ),
+              ),
+              FutureBuilder<List<Vins>>(
+                  future: vinsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Ca marche po');
+                    } else if (snapshot.hasData) {
+                      final vins = snapshot.data!;
+
+                      return buildVins(vins);
+                    } else {
+                      return const Text('Pas de données vin.');
+                    }
+                  })
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
