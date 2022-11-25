@@ -180,10 +180,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       style: TextStyle(fontSize: 20),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginPage(title: "Login")));
+                      Navigator.pop(context);
                     },
                   )
                 ],
