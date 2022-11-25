@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'camera_page.dart';
 import 'login_page.dart';
 import 'Vins.dart';
+import 'detail_vin_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -42,6 +43,9 @@ class _MyHomePageState extends State<MyHomePage> {
           final vin = vins[index];
           return Card(
             child: ListTile(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailVin(nom: vin.nom, descriptif: vin.descriptif, couleur: vin.couleur, embouteillage: vin.embouteillage, cepage: vin.cepage, chateau_domaine_propriete_clos: vin.chateau_domaine_propriete_clos, annee: vin.annee, prix: vin.prix, image_bouteille: vin.image_bouteille, url_producteur: vin.url_producteur))); // To adapt
+              },
               leading: CircleAvatar(
                 radius: 28,
                 backgroundImage: NetworkImage(vin.image_bouteille),
@@ -92,10 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LoginPage(title: "Login")));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(title: "Login")));
                 },
                 child: const Text(
                   'Se connecter/S\'inscrire ',
