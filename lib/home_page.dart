@@ -20,10 +20,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<Vins>> vinsFuture = getVins();
 
   static Future<List<Vins>> getVins() async {
-    var response =
-        await http.get(Uri.parse('http://192.168.1.154:5000/api/vins'));
+    var response = await http.get(Uri.parse('http://192.168.1.154:5000/api/vins'));
     var body = json.decode(response.body);
-    print("dataContentVins : $body");
     return body.map<Vins>(Vins.fromJson).toList();
   }
 

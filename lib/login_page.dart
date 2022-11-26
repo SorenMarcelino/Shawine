@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<http.Response> postUser(
       TextEditingController name, TextEditingController password) async {
     var data = {'email': name.text, 'password': password.text};
-    print("dataContentUser : $data"); // Debug
     // BEGIN -- Envoi de la reqête au serveur //
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/auth/login'),
@@ -29,9 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       body: jsonEncode(data),
     );
-    // END -- Envoi de la reqête au serveur //
-    print('Body: ${response.statusCode}'); // Debug
-    print('Body: ${response.body}'); // Debug
+    // END -- Envoi de la reqête au serveur //bug
     if (response.statusCode == 200) {
       Navigator.push(
           context,
