@@ -6,8 +6,8 @@ import 'camera_page.dart';
 import 'login_page.dart';
 import 'Vins.dart';
 import 'detail_vin_page.dart';
-
 import 'package:flutter_session_manager/flutter_session_manager.dart';
+import 'add_vin_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -80,6 +80,17 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add_outlined ,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AddVinPage(title: "Ajouter un vin")));
+            },
+          )
+        ],
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),

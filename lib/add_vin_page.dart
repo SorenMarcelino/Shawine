@@ -1,0 +1,277 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'login_page.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
+
+class AddVinPage extends StatefulWidget {
+  const AddVinPage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<AddVinPage> createState() => _AddVinPageState();
+}
+
+class _AddVinPageState extends State<AddVinPage> {
+  TextEditingController nomController = TextEditingController();
+  TextEditingController descriptifController = TextEditingController();
+  TextEditingController couleurController = TextEditingController();
+  TextEditingController embouteillageController = TextEditingController();
+  TextEditingController cepageController = TextEditingController();
+  TextEditingController chateau_domaine_propriete_closController =
+      TextEditingController();
+  TextEditingController anneeController = TextEditingController();
+  TextEditingController prixController = TextEditingController();
+  TextEditingController image_bouteilleController = TextEditingController();
+  TextEditingController url_producteurController = TextEditingController();
+
+  Future<http.Response> postVin(
+      TextEditingController nom,
+      TextEditingController descriptif,
+      TextEditingController couleur,
+      TextEditingController embouteillage,
+      TextEditingController cepage,
+      TextEditingController chateau_domaine_propriete_clos,
+      TextEditingController annee,
+      TextEditingController prix,
+      TextEditingController image_bouteille,
+      TextEditingController url_producteur) async {
+    var data = {
+      'nom': nom.text,
+      'descriptif': descriptif.text,
+      'couleur': couleur.text,
+      'embouteillage': embouteillage.text,
+      'cepage': cepage.text,
+      'chateau_domaine_propriete_clos': chateau_domaine_propriete_clos.text,
+      'annee': annee.text,
+      'prix': prix.text,
+      'image_bouteille': image_bouteille.text,
+      'url_producteur': url_producteur.text
+    };
+    dynamic user_token = await SessionManager().get("token");
+    print("dataContentUser : $data"); // Debug
+    // BEGIN -- Envoi de la reqête au serveur //
+    var response = await http.post(
+      Uri.parse('http://192.168.1.154:5000/api/vins'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      body: jsonEncode(data),
+    );
+    // END -- Envoi de la reqête au serveur //
+    print('Body: ${response.statusCode}'); // Debug
+    print('Body: ${response.body}'); // Debug
+    if (response.statusCode == 200) {
+      _successPost();
+    }
+    else{
+      _failPost();
+    }
+    return response;
+  }
+
+  Future<void> _successPost() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vin ajouté'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Le vin à bien été ajouté à la collection.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _failPost() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vin non ajouté'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Le vin n\'a pas été ajouté.'),
+                Text('Vous n\'avez pas le droit d\'ajouter un vin.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Ajouter un vin à la collection',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 30),
+                  )),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: nomController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nom',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: descriptifController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Descriptif',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: couleurController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'couleur',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: embouteillageController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Embouteillage',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: cepageController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Cepage',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: chateau_domaine_propriete_closController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Chateau / Domaine / Propriété / Clos',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: anneeController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Année',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: prixController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Prix',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: image_bouteilleController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'image_bouteille',
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: TextField(
+                  controller: url_producteurController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'url_producteur',
+                  ),
+                ),
+              ),
+              Container(
+                  height: 50,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: ElevatedButton(
+                    child: const Text('Ajouter'),
+                    onPressed: () {
+                      postVin(
+                          nomController,
+                          descriptifController,
+                          couleurController,
+                          embouteillageController,
+                          cepageController,
+                          chateau_domaine_propriete_closController,
+                          anneeController,
+                          prixController,
+                          image_bouteilleController,
+                          url_producteurController);
+                    },
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
