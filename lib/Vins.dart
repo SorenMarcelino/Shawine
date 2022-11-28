@@ -1,4 +1,5 @@
 class Vins {
+  final String id;
   final String nom;
   final String descriptif;
   final String couleur;
@@ -11,6 +12,7 @@ class Vins {
   final String url_producteur;
 
   const Vins({
+    required this.id,
     required this.nom,
     required this.descriptif,
     required this.couleur,
@@ -24,6 +26,7 @@ class Vins {
   });
 
   static Vins fromJson(json) => Vins(
+      id: json['_id']['\$oid'],
       nom: json['nom'],
       descriptif: json['descriptif'],
       couleur: json['couleur'],

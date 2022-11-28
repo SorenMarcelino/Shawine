@@ -35,6 +35,7 @@ class _PreviewPageState extends State<PreviewPage> {
           context,
           MaterialPageRoute(
               builder: (context) => DetailVin(
+                  id: data['_id']['\$oid'],
                   nom: data['nom'],
                   descriptif: data['descriptif'],
                   couleur: data['couleur'],

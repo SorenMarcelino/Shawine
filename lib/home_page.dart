@@ -40,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => DetailVin(
+                            id: vin.id,
                             nom: vin.nom,
                             descriptif: vin.descriptif,
                             couleur: vin.couleur,

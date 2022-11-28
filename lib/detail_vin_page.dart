@@ -7,10 +7,12 @@ import 'Vins.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Commentaires.dart';
 import 'User.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
 
 class DetailVin extends StatefulWidget {
   const DetailVin(
       {super.key,
+      required this.id,
       required this.nom,
       required this.descriptif,
       required this.couleur,
@@ -22,6 +24,7 @@ class DetailVin extends StatefulWidget {
       required this.image_bouteille,
       required this.url_producteur});
 
+  final String id;
   final String nom;
   final String descriptif;
   final String couleur;
@@ -92,7 +95,7 @@ class _DetailVinState extends State<DetailVin> {
     Map<String, dynamic> res = jsonDecode(response.body);
     print('Result : ' + res['nom']);
 
-    return res['prenom']+' '+ res['nom'];
+    return res['prenom'] + ' ' + res['nom'];
   }
 
   Widget buildCommentaires(List<Commentaires> commentaires) => ListView.builder(
@@ -128,6 +131,24 @@ class _DetailVinState extends State<DetailVin> {
               });
         },
       );
+
+  TextEditingController commentaireController = TextEditingController();
+
+  Future<http.Response> postCommentaire(TextEditingController commentaire) async {
+    var data = {'commentaire': commentaire.text};
+    dynamic id = await SessionManager().get("token");
+    var response = await http.post(
+      Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $id',
+      },
+      body: jsonEncode(data),
+    );
+    print(response.body);
+
+    return response;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,11 +230,18 @@ class _DetailVinState extends State<DetailVin> {
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                 child: TextField(
                   maxLines: 2, //or null
+                  controller: commentaireController,
                   decoration: InputDecoration.collapsed(
                     hintText: "Ecrivez votre commentaire ici",
                     border: OutlineInputBorder(),
                   ),
                 ),
+              ),
+              ElevatedButton(
+                child: const Text('Envoyer le commentaire'),
+                onPressed: () {
+                  postCommentaire(commentaireController);
+                },
               ),
               FutureBuilder<List<Commentaires>>(
                   future: commentairesFuture,
