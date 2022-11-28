@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'test_handle_token.dart';
 import 'signUp_page.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});
@@ -17,6 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  var sessionManager = SessionManager();
+
   Future<http.Response> postUser(
       TextEditingController name, TextEditingController password) async {
     var data = {'email': name.text, 'password': password.text};
@@ -28,13 +32,21 @@ class _LoginPageState extends State<LoginPage> {
       },
       body: jsonEncode(data),
     );
+    print(response.body);
+
+    Map<String, dynamic> res = jsonDecode(response.body);
+    print('Result : ' + res['_id']['\$oid']);
+
+    await sessionManager.set('id', res['_id']['\$oid']);
+    await sessionManager.set('nom', res['nom']);
+    await sessionManager.set('prenom', res['prenom']);
+    await sessionManager.set('email', res['email']);
+    await sessionManager.set('avatar', res['avatar']);
+    await sessionManager.set('token', res['token']);
+
     // END -- Envoi de la reqête au serveur //bug
     if (response.statusCode == 200) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  HandleToken(title: "HandleToken", token: response.body)));
+      Navigator.pop(context);
     }
     return response;
   }
