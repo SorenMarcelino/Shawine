@@ -353,11 +353,52 @@ class _DetailVinState extends State<DetailVin> {
     return response;
   }
 
+  Future<http.Response> deleteVin(String commentaire_id) async {
+    dynamic user_token = await SessionManager().get("token");
+    var response = await http.delete(
+      Uri.parse(
+          'http://192.168.1.154:5000/api/vin/${widget.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      //body: jsonEncode(data),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      _successDelete();
+    } else {
+      _failDelete();
+    }
+
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.nom),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.edit_outlined ,
+              color: Colors.white,
+            ),
+            onPressed: () {
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.delete_outline ,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              deleteVin(widget.id);
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Container(
         child: SingleChildScrollView(
