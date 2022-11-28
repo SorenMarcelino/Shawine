@@ -5,6 +5,8 @@ import 'test_handle_token.dart';
 import 'signUp_page.dart';
 import 'Vins.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'Commentaires.dart';
+import 'User.dart';
 
 class DetailVin extends StatefulWidget {
   const DetailVin(
@@ -72,6 +74,61 @@ class _DetailVinState extends State<DetailVin> {
     }
   }
 
+  Future<List<Commentaires>> commentairesFuture = getCommentaires();
+
+  static Future<List<Commentaires>> getCommentaires() async {
+    var response = await http.get(Uri.parse(
+        'http://192.168.1.154:5000/api/vin/AOC BOURGOGNE HAUTES-CÔTES DE BEAUNE/commentaires'));
+    var body = json.decode(response.body);
+    print(body);
+    return body.map<Commentaires>(Commentaires.fromJson).toList();
+  }
+
+  Future<String> getUser(String userId) async {
+    var response =
+        await http.get(Uri.parse('http://192.168.1.154:5000/api/user/$userId'));
+    var body = json.decode(response.body);
+
+    Map<String, dynamic> res = jsonDecode(response.body);
+    print('Result : ' + res['nom']);
+
+    return res['prenom']+' '+ res['nom'];
+  }
+
+  Widget buildCommentaires(List<Commentaires> commentaires) => ListView.builder(
+        shrinkWrap: true,
+        itemCount: commentaires.length,
+        itemBuilder: (context, index) {
+          final commentaire = commentaires[index];
+          var userNom = getUser(commentaire.added_by);
+          return FutureBuilder<String>(
+              future: userNom,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text("ERROR: ${snapshot.error}");
+                } else if (snapshot.hasData) {
+                  final user = snapshot.data!;
+
+                  print('userNom : $user');
+                  return Card(
+                    child: ListTile(
+                      /*leading: CircleAvatar(
+                        radius: 28,
+                        backgroundImage: NetworkImage(user.avatar),
+                      ),*/
+                      title: Text(user),
+                      subtitle: Text(commentaire.commentaire),
+                    ),
+                  );
+                } else {
+                  return const Text('Pas de données vin.');
+                }
+              });
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +146,11 @@ class _DetailVinState extends State<DetailVin> {
                 child: Image.network(widget.image_bouteille),
               ),
               Container(
-                child: Text(widget.nom, style: TextStyle(fontSize: 25), textAlign: TextAlign.center,),
+                child: Text(
+                  widget.nom,
+                  style: TextStyle(fontSize: 25),
+                  textAlign: TextAlign.center,
+                ),
               ),
               Card(
                 child: ListTile(
@@ -137,6 +198,38 @@ class _DetailVinState extends State<DetailVin> {
                   _launchURL(widget.url_producteur);
                 },
               ),
+              Container(
+                child: Text(
+                  "Commentaires",
+                  style: TextStyle(fontSize: 25),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextField(
+                  maxLines: 2, //or null
+                  decoration: InputDecoration.collapsed(
+                    hintText: "Ecrivez votre commentaire ici",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              FutureBuilder<List<Commentaires>>(
+                  future: commentairesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text("ERROR: ${snapshot.error}");
+                    } else if (snapshot.hasData) {
+                      final commentaires = snapshot.data!;
+
+                      return buildCommentaires(commentaires);
+                    } else {
+                      return const Text('Pas de données vin.');
+                    }
+                  }),
             ],
           ),
         ),
