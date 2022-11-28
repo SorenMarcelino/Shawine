@@ -98,6 +98,61 @@ class _DetailVinState extends State<DetailVin> {
     return res['prenom'] + ' ' + res['nom'];
   }
 
+  Future<void> _successDelete() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Suppression réussie'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Votre commentaire à bien été supprimé.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _failDelete() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Suppression échouée'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Le commentaire n\'a pas été supprimé.'),
+                Text('Vous n\'êtes peut-être pas le propriétaire de ce commentaire.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget buildCommentaires(List<Commentaires> commentaires) => ListView.builder(
         shrinkWrap: true,
         itemCount: commentaires.length,
@@ -116,13 +171,37 @@ class _DetailVinState extends State<DetailVin> {
 
                   print('userNom : $user');
                   return Card(
-                    child: ListTile(
-                      /*leading: CircleAvatar(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          /*leading: CircleAvatar(
                         radius: 28,
                         backgroundImage: NetworkImage(user.avatar),
                       ),*/
-                      title: Text(user),
-                      subtitle: Text(commentaire.commentaire),
+                          title: Text(user),
+                          subtitle: Text(commentaire.commentaire),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              tooltip: 'Modifier',
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: 'Supprimer',
+                              onPressed: () {
+                                deleteCommentaire(commentaire.commentaire_id);
+                                //_successDelete();
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   );
                 } else {
@@ -134,18 +213,41 @@ class _DetailVinState extends State<DetailVin> {
 
   TextEditingController commentaireController = TextEditingController();
 
-  Future<http.Response> postCommentaire(TextEditingController commentaire) async {
+  Future<http.Response> postCommentaire(
+      TextEditingController commentaire) async {
     var data = {'commentaire': commentaire.text};
-    dynamic id = await SessionManager().get("token");
+    dynamic user_token = await SessionManager().get("token");
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'),
       headers: <String, String>{
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $id',
+        'Authorization': 'Bearer $user_token',
       },
       body: jsonEncode(data),
     );
     print(response.body);
+
+    return response;
+  }
+
+  Future<http.Response> deleteCommentaire(String commentaire_id) async {
+    dynamic user_token = await SessionManager().get("token");
+    var response = await http.delete(
+      Uri.parse(
+          'http://192.168.1.154:5000/api/vin/${widget.id}/commentaire/${commentaire_id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      //body: jsonEncode(data),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      _successDelete();
+    }
+    else{
+      _failDelete();
+    }
 
     return response;
   }
