@@ -191,7 +191,8 @@ class _DetailVinState extends State<DetailVin> {
             child: ListBody(
               children: const <Widget>[
                 Text('Le commentaire n\'a pas été supprimé.'),
-                Text('Vous n\'êtes peut-être pas le propriétaire de ce commentaire.'),
+                Text(
+                    'Vous n\'êtes peut-être pas le propriétaire de ce commentaire.'),
               ],
             ),
           ),
@@ -206,6 +207,47 @@ class _DetailVinState extends State<DetailVin> {
         );
       },
     );
+  }
+
+
+
+  Future<void> _editCommentaire(BuildContext context,
+      String commentaire, String commentaire_id) async {
+    TextEditingController editCommentaireController = TextEditingController(text: commentaire);
+    print(editCommentaireController);
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Modifiez votre commentaire'),
+            content: Column(
+              children: <Widget>[
+                TextField(
+                  maxLines: 2,
+                  //initialValue: commentaire,
+                  controller: editCommentaireController,
+                  decoration: InputDecoration(
+                      hintText: "Ecrivez votre commentaire ici"),
+                ),
+                ElevatedButton(
+                  child: const Text('Modifier le commentaire'),
+                  onPressed: () {
+                    editCommentaire(editCommentaireController, commentaire_id);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('RETOUR'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 
   Widget buildCommentaires(List<Commentaires> commentaires) => ListView.builder(
@@ -243,14 +285,16 @@ class _DetailVinState extends State<DetailVin> {
                             IconButton(
                               icon: const Icon(Icons.edit_outlined),
                               tooltip: 'Modifier',
-                              onPressed: () {},
+                              onPressed: () {
+                                _editCommentaire(
+                                    context, commentaire.commentaire, commentaire.commentaire_id);
+                              },
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline),
                               tooltip: 'Supprimer',
                               onPressed: () {
                                 deleteCommentaire(commentaire.commentaire_id);
-                                //_successDelete();
                                 setState(() {});
                               },
                             ),
@@ -284,12 +328,35 @@ class _DetailVinState extends State<DetailVin> {
 
     if (response.statusCode == 200) {
       _successPost();
-    }
-    else{
+    } else {
       _failPost();
     }
 
-      return response;
+    return response;
+  }
+
+  Future<http.Response> editCommentaire(
+      TextEditingController commentaire, String commentaire_id) async {
+    var data = {'commentaire': commentaire.text};
+    dynamic user_token = await SessionManager().get("token");
+    var response = await http.put(
+      Uri.parse(
+          'http://192.168.1.154:5000/api/vin/${widget.id}/commentaire/${commentaire_id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      body: jsonEncode(data),
+    );
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      _successPost();
+    } else {
+      _failPost();
+    }
+
+    return response;
   }
 
   Future<http.Response> deleteCommentaire(String commentaire_id) async {
@@ -306,8 +373,7 @@ class _DetailVinState extends State<DetailVin> {
     print(response.body);
     if (response.statusCode == 200) {
       _successDelete();
-    }
-    else{
+    } else {
       _failDelete();
     }
 
