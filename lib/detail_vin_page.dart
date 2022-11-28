@@ -98,6 +98,61 @@ class _DetailVinState extends State<DetailVin> {
     return res['prenom'] + ' ' + res['nom'];
   }
 
+  Future<void> _successPost() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Commentaire publié'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Votre commentaire à bien été publié.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _failPost() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Commentaire non publié'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Votre commentaire n\'a pas été publié.'),
+                Text('Vous n\'êtes peut-être pas encore connecté.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _successDelete() async {
     return showDialog<void>(
       context: context,
@@ -227,7 +282,14 @@ class _DetailVinState extends State<DetailVin> {
     );
     print(response.body);
 
-    return response;
+    if (response.statusCode == 200) {
+      _successPost();
+    }
+    else{
+      _failPost();
+    }
+
+      return response;
   }
 
   Future<http.Response> deleteCommentaire(String commentaire_id) async {
