@@ -41,33 +41,6 @@ class DetailVin extends StatefulWidget {
 }
 
 class _DetailVinState extends State<DetailVin> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  Future<http.Response> postUser(
-      TextEditingController name, TextEditingController password) async {
-    var data = {'email': name.text, 'password': password.text};
-    print("dataContentUser : $data"); // Debug
-    // BEGIN -- Envoi de la reqête au serveur //
-    var response = await http.post(
-      Uri.parse('http://192.168.1.154:5000/api/auth/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(data),
-    );
-    // END -- Envoi de la reqête au serveur //
-    print('Body: ${response.statusCode}'); // Debug
-    print('Body: ${response.body}'); // Debug
-    if (response.statusCode == 200) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  HandleToken(title: "HandleToken", token: response.body)));
-    }
-    return response;
-  }
 
   _launchURL(String url) async {
     if (await canLaunch(url)) {
@@ -77,11 +50,11 @@ class _DetailVinState extends State<DetailVin> {
     }
   }
 
-  Future<List<Commentaires>> commentairesFuture = getCommentaires();
+  late Future<List<Commentaires>> commentairesFuture = getCommentaires();
 
-  static Future<List<Commentaires>> getCommentaires() async {
+  Future<List<Commentaires>> getCommentaires() async {
     var response = await http.get(Uri.parse(
-        'http://192.168.1.154:5000/api/vin/AOC BOURGOGNE HAUTES-CÔTES DE BEAUNE/commentaires'));
+        'http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'));
     var body = json.decode(response.body);
     print(body);
     return body.map<Commentaires>(Commentaires.fromJson).toList();
