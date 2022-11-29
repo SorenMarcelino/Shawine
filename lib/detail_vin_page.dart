@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'Commentaires.dart';
 import 'User.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
+import 'edit_vin_page.dart';
 
 class DetailVin extends StatefulWidget {
   const DetailVin(
@@ -41,7 +42,6 @@ class DetailVin extends StatefulWidget {
 }
 
 class _DetailVinState extends State<DetailVin> {
-
   _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -57,6 +57,11 @@ class _DetailVinState extends State<DetailVin> {
         'http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'));
     var body = json.decode(response.body);
     print(body);
+    if(response.statusCode == 200){
+      setState(() {
+
+      });
+    }
     return body.map<Commentaires>(Commentaires.fromJson).toList();
   }
 
@@ -89,7 +94,8 @@ class _DetailVinState extends State<DetailVin> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Navigator.pop(context);
               },
             ),
           ],
@@ -182,11 +188,10 @@ class _DetailVinState extends State<DetailVin> {
     );
   }
 
-
-
-  Future<void> _editCommentaire(BuildContext context,
-      String commentaire, String commentaire_id) async {
-    TextEditingController editCommentaireController = TextEditingController(text: commentaire);
+  Future<void> _editCommentaire(
+      BuildContext context, String commentaire, String commentaire_id) async {
+    TextEditingController editCommentaireController =
+        TextEditingController(text: commentaire);
     print(editCommentaireController);
     return showDialog(
         context: context,
@@ -260,7 +265,9 @@ class _DetailVinState extends State<DetailVin> {
                               tooltip: 'Modifier',
                               onPressed: () {
                                 _editCommentaire(
-                                    context, commentaire.commentaire, commentaire.commentaire_id);
+                                    context,
+                                    commentaire.commentaire,
+                                    commentaire.commentaire_id);
                               },
                             ),
                             IconButton(
@@ -356,8 +363,7 @@ class _DetailVinState extends State<DetailVin> {
   Future<http.Response> deleteVin(String commentaire_id) async {
     dynamic user_token = await SessionManager().get("token");
     var response = await http.delete(
-      Uri.parse(
-          'http://192.168.1.154:5000/api/vin/${widget.id}'),
+      Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $user_token',
@@ -382,15 +388,32 @@ class _DetailVinState extends State<DetailVin> {
         actions: <Widget>[
           IconButton(
             icon: Icon(
-              Icons.edit_outlined ,
+              Icons.edit_outlined,
               color: Colors.white,
             ),
             onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EditVinPage(
+                          title: "Ajouter un vin",
+                          id: widget.id,
+                          nom: widget.nom,
+                          descriptif: widget.descriptif,
+                          couleur: widget.couleur,
+                          embouteillage: widget.embouteillage,
+                          cepage: widget.cepage,
+                          chateau_domaine_propriete_clos:
+                              widget.chateau_domaine_propriete_clos,
+                          annee: widget.annee,
+                          prix: widget.prix,
+                          image_bouteille: widget.image_bouteille,
+                          url_producteur: widget.url_producteur)));
             },
           ),
           IconButton(
             icon: Icon(
-              Icons.delete_outline ,
+              Icons.delete_outline,
               color: Colors.white,
             ),
             onPressed: () {
