@@ -57,10 +57,8 @@ class _DetailVinState extends State<DetailVin> {
         'http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'));
     var body = json.decode(response.body);
     print(body);
-    if(response.statusCode == 200){
-      setState(() {
-
-      });
+    if (response.statusCode == 200) {
+      setState(() {});
     }
     return body.map<Commentaires>(Commentaires.fromJson).toList();
   }
@@ -188,6 +186,228 @@ class _DetailVinState extends State<DetailVin> {
     );
   }
 
+  String noteFromAPI = 'Pas de note donnée';
+  int note = 10;
+
+  Future<http.Response> getNoteVin() async {
+    dynamic user_token = await SessionManager().get("token");
+    dynamic user_id = await SessionManager().get("id");
+    var response = await http.get(
+      Uri.parse(
+          'http://192.168.1.154:5000/api/vin/${widget.id}/commentaires/$user_id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      //body: jsonEncode(data),
+    );
+
+    Map<String, dynamic> res = jsonDecode(response.body);
+    print('Result : ' + res['note'].toString());
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      noteFromAPI = res['note'].toString();
+      setState(() {
+        noteFromAPI = res['note'].toString();
+      });
+      print('noteFromAPI : $noteFromAPI');
+    } else {}
+
+    return response;
+  }
+
+  Future<void> _failNote() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vin déjà noté'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Vous avez déjà noté ce vin.'),
+                Text('Vous ne pouvez pas donner une nouvelle note à ce vin'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _postCommentaire() async {
+    TextEditingController commentaireController = TextEditingController();
+    await getNoteVin();
+    print(commentaireController);
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Saisissez votre commentaire'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(noteFromAPI),
+                      Icon(Icons.star),
+                    ],
+                  ),
+                  TextField(
+                    maxLines: 2,
+                    //initialValue: commentaire,
+                    controller: commentaireController,
+                    decoration: InputDecoration(
+                        hintText: "Ecrivez votre commentaire ici"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 0;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 1;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 2;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 3;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 4;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star_border, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (noteFromAPI == 'Pas de note donnée') {
+                        note = 5;
+                      } else {
+                        _failNote();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                        Icon(Icons.star, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    child: const Text('Publier le commentaire'),
+                    onPressed: () {
+                      postCommentaire(commentaireController, note);
+                      //Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('RETOUR'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   Future<void> _editCommentaire(
       BuildContext context, String commentaire, String commentaire_id) async {
     TextEditingController editCommentaireController =
@@ -293,8 +513,8 @@ class _DetailVinState extends State<DetailVin> {
   TextEditingController commentaireController = TextEditingController();
 
   Future<http.Response> postCommentaire(
-      TextEditingController commentaire) async {
-    var data = {'commentaire': commentaire.text};
+      TextEditingController commentaire, int note) async {
+    var data = {'commentaire': commentaire.text, 'note': note};
     dynamic user_token = await SessionManager().get("token");
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'),
@@ -493,21 +713,11 @@ class _DetailVinState extends State<DetailVin> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                child: TextField(
-                  maxLines: 2, //or null
-                  controller: commentaireController,
-                  decoration: InputDecoration.collapsed(
-                    hintText: "Ecrivez votre commentaire ici",
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
               ElevatedButton(
-                child: const Text('Envoyer le commentaire'),
+                child: const Text('Publier un commentaire'),
                 onPressed: () {
-                  postCommentaire(commentaireController);
+                  getNoteVin();
+                  _postCommentaire();
                 },
               ),
               FutureBuilder<List<Commentaires>>(
