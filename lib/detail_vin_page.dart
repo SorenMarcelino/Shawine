@@ -57,10 +57,30 @@ class _DetailVinState extends State<DetailVin> {
         'http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'));
     var body = json.decode(response.body);
     print(body);
+
     if (response.statusCode == 200) {
       setState(() {});
     }
     return body.map<Commentaires>(Commentaires.fromJson).toList();
+  }
+
+  num sum = 0;
+  num? moyenne;
+  String moyenneString = '';
+  int nbNote = 0;
+  num? calculMoyenne(List<Commentaires> commentaires) {
+    for (int i = 0; i < commentaires.length; i++) {
+      print(commentaires[i].note);
+      if (commentaires[i].note != null) {
+        sum += commentaires[i].note!;
+        nbNote += 1;
+      }
+    }
+    print('$sum / ${commentaires.length}');
+    moyenne = sum / nbNote;
+    moyenneString = moyenne.toString();
+    print('moyenne : $moyenne');
+    return moyenne;
   }
 
   Future<String> getUser(String userId) async {
@@ -476,7 +496,7 @@ class _DetailVinState extends State<DetailVin> {
                           title: Row(
                             children: [
                               Text(user),
-                              if(commentaire.note != null)...[
+                              if (commentaire.note != null) ...[
                                 Text(' - ${commentaire.note}'),
                                 Icon(Icons.star),
                               ],
@@ -607,6 +627,29 @@ class _DetailVinState extends State<DetailVin> {
     return response;
   }
 
+  Widget buildMoyenne(num? moyenne) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          if (moyenne != null) ...[
+            Text(
+              moyenne.toString(),
+              style: TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+            Icon(Icons.star),
+          ],
+        ],
+      );
+
+  /*if (moyenne != null) ...[
+  Text(
+  moyenne.toString(),
+  style: TextStyle(fontSize: 20),
+  textAlign: TextAlign.center,
+  ),
+  Icon(Icons.star),
+  ],*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -667,6 +710,27 @@ class _DetailVinState extends State<DetailVin> {
                   textAlign: TextAlign.center,
                 ),
               ),
+              //Row(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              //children: <Widget>[
+              FutureBuilder<List<Commentaires>>(
+                  future: commentairesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text("ERROR: ${snapshot.error}");
+                    } else if (snapshot.hasData) {
+                      final commentaires = snapshot.data!;
+                      final moyenne = calculMoyenne(commentaires);
+
+                      return buildMoyenne(moyenne);
+                    } else {
+                      return const Text('Pas de données vin.');
+                    }
+                  }),
+              //],
+              //),
               Card(
                 child: ListTile(
                   onTap: () {},
@@ -736,6 +800,7 @@ class _DetailVinState extends State<DetailVin> {
                       return Text("ERROR: ${snapshot.error}");
                     } else if (snapshot.hasData) {
                       final commentaires = snapshot.data!;
+                      calculMoyenne(commentaires);
 
                       return buildCommentaires(commentaires);
                     } else {

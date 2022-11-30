@@ -4,7 +4,7 @@ class Commentaires {
   final String vin_commente_id;
   //final DateTime date;
   final String commentaire;
-  final int? note;
+  final num? note;
 
   const Commentaires({
     required this.commentaire_id,
