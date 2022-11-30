@@ -464,7 +464,6 @@ class _DetailVinState extends State<DetailVin> {
                 } else if (snapshot.hasData) {
                   final user = snapshot.data!;
 
-                  print('userNom : $user');
                   return Card(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -474,7 +473,15 @@ class _DetailVinState extends State<DetailVin> {
                         radius: 28,
                         backgroundImage: NetworkImage(user.avatar),
                       ),*/
-                          title: Text(user),
+                          title: Row(
+                            children: [
+                              Text(user),
+                              if(commentaire.note != null)...[
+                                Text(' - ${commentaire.note}'),
+                                Icon(Icons.star),
+                              ],
+                            ],
+                          ),
                           subtitle: Text(commentaire.commentaire),
                         ),
                         Row(
