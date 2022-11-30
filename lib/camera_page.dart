@@ -45,7 +45,7 @@ class _CameraPageState extends State<CameraPage> {
                 picture: picture,
               )));
     } on CameraException catch (e) {
-      debugPrint('Error occured while taking picture: $e');
+      debugPrint('Error occurred while taking picture: $e');
       return null;
     }
   }

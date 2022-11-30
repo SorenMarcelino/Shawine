@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<http.Response> postUser(
       TextEditingController name, TextEditingController password) async {
     var data = {'email': name.text, 'password': password.text};
-    // BEGIN -- Envoi de la reqête au serveur //
+    // BEGIN -- Envoi de la requête au serveur //
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/auth/login'),
       headers: <String, String>{
@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
     await sessionManager.set('avatar', res['avatar']);
     await sessionManager.set('token', res['token']);
 
-    // END -- Envoi de la reqête au serveur //bug
+    // END -- Envoi de la requête au serveur //bug
     if (response.statusCode == 200) {
       Navigator.pop(context);
     }

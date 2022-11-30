@@ -75,7 +75,7 @@ class _EditVinPageState extends State<EditVinPage> {
     };
     dynamic user_token = await SessionManager().get("token");
     print("dataContentUser : $data"); // Debug
-    // BEGIN -- Envoi de la reqête au serveur //
+    // BEGIN -- Envoi de la requête au serveur //
     var response = await http.put(
       Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}'),
       headers: <String, String>{
@@ -84,7 +84,7 @@ class _EditVinPageState extends State<EditVinPage> {
       },
       body: jsonEncode(data),
     );
-    // END -- Envoi de la reqête au serveur //
+    // END -- Envoi de la requête au serveur //
     print('Body: ${response.statusCode}'); // Debug
     print('Body: ${response.body}'); // Debug
     if (response.statusCode == 200) {

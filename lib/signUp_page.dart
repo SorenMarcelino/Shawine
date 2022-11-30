@@ -34,7 +34,7 @@ class _SignUpPageState extends State<SignUpPage> {
       'avatar': avatar.text
     };
     print("dataContentUser : $data"); // Debug
-    // BEGIN -- Envoi de la reqête au serveur //
+    // BEGIN -- Envoi de la requête au serveur //
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/auth/signup'),
       headers: <String, String>{
@@ -42,7 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       body: jsonEncode(data),
     );
-    // END -- Envoi de la reqête au serveur //
+    // END -- Envoi de la requête au serveur //
     print('Body: ${response.statusCode}'); // Debug
     print('Body: ${response.body}'); // Debug
     if (response.statusCode == 200) {
