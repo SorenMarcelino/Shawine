@@ -641,15 +641,6 @@ class _DetailVinState extends State<DetailVin> {
         ],
       );
 
-  /*if (moyenne != null) ...[
-  Text(
-  moyenne.toString(),
-  style: TextStyle(fontSize: 20),
-  textAlign: TextAlign.center,
-  ),
-  Icon(Icons.star),
-  ],*/
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -666,7 +657,7 @@ class _DetailVinState extends State<DetailVin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => EditVinPage(
-                          title: "Ajouter un vin",
+                          title: "Modifier un vin",
                           id: widget.id,
                           nom: widget.nom,
                           descriptif: widget.descriptif,
@@ -710,9 +701,6 @@ class _DetailVinState extends State<DetailVin> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              //Row(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              //children: <Widget>[
               FutureBuilder<List<Commentaires>>(
                   future: commentairesFuture,
                   builder: (context, snapshot) {
@@ -729,8 +717,6 @@ class _DetailVinState extends State<DetailVin> {
                       return const Text('Pas de données vin.');
                     }
                   }),
-              //],
-              //),
               Card(
                 child: ListTile(
                   onTap: () {},

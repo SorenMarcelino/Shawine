@@ -166,7 +166,7 @@ class _EditVinPageState extends State<EditVinPage> {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(10),
                   child: const Text(
-                    'Ajouter un vin à la collection',
+                    'Modifier un vin de la collection',
                     style: TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.w500,
