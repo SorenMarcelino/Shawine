@@ -207,7 +207,8 @@ class _DetailVinState extends State<DetailVin> {
   }
 
   String noteFromAPI = 'Pas de note donnée';
-  int note = 10;
+  bool isNewNote = false;
+  late int note;
 
   Future<http.Response> getNoteVin() async {
     dynamic user_token = await SessionManager().get("token");
@@ -296,6 +297,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 0;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -315,6 +317,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 1;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -334,6 +337,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 2;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -353,6 +357,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 3;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -372,6 +377,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 4;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -391,6 +397,7 @@ class _DetailVinState extends State<DetailVin> {
                     onPressed: () {
                       if (noteFromAPI == 'Pas de note donnée') {
                         note = 5;
+                        isNewNote = true;
                       } else {
                         _failNote();
                       }
@@ -409,7 +416,12 @@ class _DetailVinState extends State<DetailVin> {
                   ElevatedButton(
                     child: const Text('Publier le commentaire'),
                     onPressed: () {
-                      postCommentaire(commentaireController, note);
+                      if(isNewNote == true){
+                        postCommentaire(commentaireController, note);
+                      }
+                      else{
+                        postCommentaireSansNote(commentaireController);
+                      }
                       //Navigator.of(context).pop();
                     },
                   ),
@@ -542,6 +554,29 @@ class _DetailVinState extends State<DetailVin> {
   Future<http.Response> postCommentaire(
       TextEditingController commentaire, int note) async {
     var data = {'commentaire': commentaire.text, 'note': note};
+    dynamic user_token = await SessionManager().get("token");
+    var response = await http.post(
+      Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $user_token',
+      },
+      body: jsonEncode(data),
+    );
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      _successPost();
+    } else {
+      _failPost();
+    }
+
+    return response;
+  }
+
+  Future<http.Response> postCommentaireSansNote(
+      TextEditingController commentaire) async {
+    var data = {'commentaire': commentaire.text};
     dynamic user_token = await SessionManager().get("token");
     var response = await http.post(
       Uri.parse('http://192.168.1.154:5000/api/vin/${widget.id}/commentaires'),
